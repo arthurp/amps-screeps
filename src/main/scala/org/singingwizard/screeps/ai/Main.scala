@@ -11,7 +11,7 @@ object Main extends js.JSApp {
   }
 
   @JSExport
-  def getLoop(g: Game, c: Console, co: Constants): js.Function0[Unit] = {
-    new Loop(g, c, co).loop _
+  def getLoop(): js.Function0[Unit] = {
+    new Loop().loop _
   }
 }
