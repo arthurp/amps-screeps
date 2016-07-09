@@ -32,3 +32,6 @@ trait Map extends js.Object {
 @js.native
 trait Market extends js.Object {
 }
+
+@js.native
+class RoomPosition(val x: Int, val y: Int, val roomName: String) extends js.Object
