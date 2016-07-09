@@ -322,8 +322,26 @@ trait ScreepsContext extends js.Object {
 
   val RawMemory: RawMemory
   
+  val PathFinder: PathFinder
+  
   @JSName("console")
   val Console: Console
   
-  val RoomPosition: RoomPositionObject
+  val Room: RoomTypeObject
+}
+
+@js.native
+trait RoomTypeObject extends js.Object {
+  def deserializePath(path: String): js.Array[PathStep]
+}
+
+object ScreepsContext {
+  implicit class ScreepsContextOps(val ctx: ScreepsContext) {
+    object RoomPosition {
+      def apply(x: Int, y: Int, roomName: String) = {
+        js.Dynamic.newInstance(ctx.asInstanceOf[js.Dynamic].RoomPosition)(x, y, roomName).asInstanceOf[RoomPosition]
+      }
+      def unapply(p: RoomPosition): Option[(Double, Double, String)] = Some((p.x, p.y, p.roomName))
+    }
+  }
 }
