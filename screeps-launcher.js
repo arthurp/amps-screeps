@@ -259,4 +259,4 @@ RESOURCES_ALL: RESOURCES_ALL,
 COLORS_ALL: COLORS_ALL
 };
 module.exports.loop = ((typeof global === "object" && global &&
-         global["Object"] === Object) ? global : this)["org"]["singingwizard"]["screeps"]["ai"]["Main"]().getLoop(Game, console, constants);
+         global["Object"] === Object) ? global : this)["org"]["singingwizard"]["screeps"]["ai"]["Main"]().getLoop(__globals);

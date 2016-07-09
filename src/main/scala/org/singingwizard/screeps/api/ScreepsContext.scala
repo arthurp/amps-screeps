@@ -4,7 +4,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation._
 
 @js.native
-trait Constants extends js.Object {
+trait ScreepsContext extends js.Object {
   val OK: Int
   val ERR_NOT_OWNER: Int
   val ERR_NO_PATH: Int
@@ -316,4 +316,14 @@ trait Constants extends js.Object {
   val RESOURCES_ALL: js.Array[String]
   val COLORS_ALL: js.Array[Int]
 
+  val Game: Game
+  
+  val Memory: js.Dynamic
+
+  val RawMemory: RawMemory
+  
+  @JSName("console")
+  val Console: Console
+  
+  val RoomPosition: RoomPositionObject
 }
