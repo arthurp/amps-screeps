@@ -23,11 +23,10 @@ val upload = taskKey[Unit]("Upload Screeps JS to server.")
 
 packageJS := {
   val code = (fullOptJS in Compile).value.data
-  val setup = baseDirectory.value / "screeps-setup.js"
   val launcher = baseDirectory.value / "screeps-launcher.js"
   val out = target.value / "amps-screeps-package.js"
-  println(s"Combining code into $out.")
-  IO.write(out, IO.read(setup) + IO.read(code) + IO.read(launcher))
+  println(s"Combining $code and $launcher into $out.")
+  IO.write(out, IO.read(code) + IO.read(launcher))
   out
 }
 
