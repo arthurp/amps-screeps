@@ -19,15 +19,29 @@ libraryDependencies ++= Seq(
 
 
 val packageJS = taskKey[File]("Package the Screeps JS.")
+val packageFastJS = taskKey[File]("Package the Screeps JS (using fastOptJS version).")
+val jsLauncher = taskKey[File]("The launcher script for Screeps scripts")
+
+jsLauncher := baseDirectory.value / "screeps-launcher.js"
+
 val upload = taskKey[Unit]("Upload Screeps JS to server.")
+
+def packageJSCode(launcher: File, code: File, out: File): File = {
+  println(s"Combining ${code.name} and ${launcher.name} into ${out.name}.")
+  IO.write(out, IO.read(code) + IO.read(launcher))
+  out
+}
 
 packageJS := {
   val code = (fullOptJS in Compile).value.data
-  val launcher = baseDirectory.value / "screeps-launcher.js"
   val out = target.value / "amps-screeps-package.js"
-  println(s"Combining $code and $launcher into $out.")
-  IO.write(out, IO.read(code) + IO.read(launcher))
-  out
+  packageJSCode(jsLauncher.value, code, out)
+}
+
+packageFastJS := {
+  val code = (fastOptJS in Compile).value.data
+  val out = target.value / "amps-screeps-fastpackage.js"
+  packageJSCode(jsLauncher.value, code, out)
 }
 
 upload := {
