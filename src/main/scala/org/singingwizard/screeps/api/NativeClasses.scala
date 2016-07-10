@@ -52,8 +52,8 @@ trait Creep extends RoomObject {
   def heal(target: Creep): Double
   def move(direction: Double): Double
   def moveByPath(path: js.Array[PathStep] | js.Any | String): Double
-  def moveTo(x: Double, y: Double, opts: MoveToOpts | PathFinderOps = ???): Double
-  //def moveTo(target: RoomPosition | js.Any, opts: MoveToOpts | PathFinderOps = ???): Double
+  //def moveTo(x: Double, y: Double, opts: MoveToOpts | PathFinderOps = ???): Double
+  def moveTo(target: RoomPosition | js.Any, opts: MoveToOpts | PathFinderOps = ???): Double
   def notifyWhenAttacked(enabled: Boolean): Double
   def pickup(target: Resource): Double
   def rangedAttack(target: Creep | Spawn | Structure): Double
@@ -320,7 +320,7 @@ trait Spawn extends OwnedStructure {
   var structureType: String
   var spawning: js.Any
   def canCreateCreep(body: js.Array[String], name: String = ???): Double
-  def createCreep(body: js.Array[String], name: String = ???, memory: js.Any = ???): Double | String
+  def createCreep(body: js.Array[String], name: String = ???, memory: js.Any = ???): Int | String
   def destroy(): Double
   def isActive(): Boolean
   def notifyWhenAttacked(enabled: Boolean): Double

@@ -328,6 +328,9 @@ trait ScreepsContext extends js.Object {
   val Console: Console
   
   val Room: RoomTypeObject
+  
+  @JSName("_")
+  val LoDash: LoDash
 }
 
 @js.native
@@ -343,5 +346,7 @@ object ScreepsContext {
       }
       def unapply(p: RoomPosition): Option[(Double, Double, String)] = Some((p.x, p.y, p.roomName))
     }
+
+    val jsObj = js.Dynamic.literal
   }
 }
