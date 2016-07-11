@@ -4,11 +4,9 @@ import scalajs.js
 import org.singingwizard.screeps.api._
 import scala.scalajs.js.UndefOr
 
-class Builder()(implicit ctx: ScreepsContext) extends Role {
-  val ctxops = new ScreepsContext.ScreepsContextOps(ctx)
+class Builder(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
   import ctx._
   import ctxops._
-  import LoDash._
 
   def run(creep: Creep): Boolean = {
     if (creep.memory.building.asInstanceOf[UndefOr[Boolean]].getOrElse(false) && creep.carry.energy == 0) {
@@ -30,9 +28,9 @@ class Builder()(implicit ctx: ScreepsContext) extends Role {
         false
       }
     } else {
-      var sources = creep.room.find(FIND_SOURCES);
-      if (creep.harvest(sources(0)) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(sources(0));
+      val source = selectSource(creep)
+      if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(source);
       }
       true
     }

@@ -1,28 +1,27 @@
 package org.singingwizard.screeps.ai
 
 import scalajs.js
+import scalajs.js.JSConverters._
 import org.singingwizard.screeps.api._
 
-class Harvester()(implicit ctx: ScreepsContext) extends Role {
-  val ctxops = new ScreepsContext.ScreepsContextOps(ctx)
+class Harvester(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
   import ctx._
   import ctxops._
-  import LoDash._
 
   def run(creep: Creep): Boolean = {
     if (creep.carry.energy < creep.carryCapacity) {
-      val sources = creep.room.find(FIND_SOURCES);
-      if (creep.harvest(sources(0)) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(sources(0));
+      val source = selectSource(creep)
+      if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(source)
       }
       true
     } else {
-      val targets = creep.room.find[Structure](FIND_STRUCTURES, jsObj(filter = (structure: js.Dynamic) => {
-          (structure.structureType == STRUCTURE_EXTENSION ||
-            structure.structureType == STRUCTURE_SPAWN ||
-            structure.structureType == STRUCTURE_TOWER) && structure.asInstanceOf[js.Dynamic].energy.asInstanceOf[Int] < structure.asInstanceOf[js.Dynamic].energyCapacity.asInstanceOf[Int]
+      val targets = creep.room.find[Structure](FIND_STRUCTURES, RoomFindOpts(structure => {
+        (structure.structureType == STRUCTURE_EXTENSION ||
+          structure.structureType == STRUCTURE_SPAWN ||
+          structure.structureType == STRUCTURE_TOWER) &&
+          (structure.asInstanceOf[js.Dynamic].energy < structure.asInstanceOf[js.Dynamic].energyCapacity).asInstanceOf[Boolean]
       }))
-      Console.log(targets.toString())
       if (targets.length > 0) {
         if (creep.transfer(targets(0), RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
           creep.moveTo(targets(0));
