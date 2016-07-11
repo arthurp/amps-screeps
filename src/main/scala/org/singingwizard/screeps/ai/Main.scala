@@ -12,6 +12,15 @@ object Main extends js.JSApp {
 
   @JSExport
   def getLoop(ctx: ScreepsContext): js.Function0[Unit] = {
-    new Loop()(ctx).loop _
+    val loop = new Loop()(ctx)
+    () => {
+      try {
+        loop.loop()
+      } catch {
+        case e: Throwable => 
+          ctx.Console.log(s"Exception while running loop: $e")
+      }
+      ()
+    }
   }
 }
