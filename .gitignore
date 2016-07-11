@@ -19,3 +19,6 @@ project/plugins/project/
 .classpath
 .project
 .settings/
+.externalToolBuilders/
+
+local.sbt
