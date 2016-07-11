@@ -4,6 +4,16 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation._
 
 @js.native
+trait ImmutableIntDictionary[T] extends js.Object {
+  @JSBracketAccess
+  def apply(i: Int): T = js.native
+}
+
+object ImmutableIntDictionary {
+  // TODO: Add wrapper to Map[Int, T]
+}
+
+@js.native
 trait ScreepsContext extends js.Object {
   val OK: Int
   val ERR_NOT_OWNER: Int
@@ -112,7 +122,7 @@ trait ScreepsContext extends js.Object {
   val RAMPART_DECAY_AMOUNT: Int
   val RAMPART_DECAY_TIME: Int
   val RAMPART_HITS: Int
-  // TODO: RAMPART_HITS_MAX: {2: 300000, 3: 1000000, 4: 3000000, 5: 10000000, 6: 30000000, 7: 100000000, 8: 300000000},
+  val RAMPART_HITS_MAX: ImmutableIntDictionary[Int]
 
   val ENERGY_REGEN_TIME: Int
   val ENERGY_DECAY: Int
@@ -130,7 +140,7 @@ trait ScreepsContext extends js.Object {
   val WALL_HITS_MAX: Int
 
   val EXTENSION_HITS: Int
-  // TODO: EXTENSION_ENERGY_CAPACITY: {0: 50, 1: 50, 2: 50, 3: 50, 4: 50, 5: 50, 6: 50, 7: 100, 8: 200},
+  val EXTENSION_ENERGY_CAPACITY: ImmutableIntDictionary[Int]
 
   val ROAD_HITS: Int
   val ROAD_WEAROUT: Int
@@ -172,7 +182,7 @@ trait ScreepsContext extends js.Object {
   val CONTROLLER_LEVELS: js.Dictionary[Int] // TODO: Keys are Int
 
   val CONTROLLER_STRUCTURES: js.Dictionary[js.Dictionary[Int]] // TODO: 2nd level keys are Int
-  // TODO: CONTROLLER_DOWNGRADE: {1: 20000, 2: 50000, 3: 50000, 4: 50000, 5: 50000, 6: 50000, 7: 50000, 8: 50000},
+  val CONTROLLER_DOWNGRADE: ImmutableIntDictionary[Int]
   val CONTROLLER_CLAIM_DOWNGRADE: Double
   val CONTROLLER_RESERVE: Int
   val CONTROLLER_RESERVE_MAX: Int
@@ -250,13 +260,7 @@ trait ScreepsContext extends js.Object {
   val NUKER_GHODIUM_CAPACITY: Int
   val NUKE_LAND_TIME: Int
   val NUKE_RANGE: Int
-  /* TODO:
-    NUKE_DAMAGE: {
-        0: 10000000,
-        1: 1000000,
-        4: 100000
-    },
-    */
+  val NUKE_DAMAGE: ImmutableIntDictionary[Int]
 
   val RESOURCE_ENERGY: String
   val RESOURCE_POWER: String
@@ -330,7 +334,7 @@ trait ScreepsContext extends js.Object {
   val Room: RoomTypeObject
   
   @JSName("_")
-  val LoDash: LoDash
+  val LoDash: js.Dynamic
 }
 
 @js.native
@@ -344,7 +348,7 @@ object ScreepsContext {
       def apply(x: Int, y: Int, roomName: String) = {
         js.Dynamic.newInstance(ctx.asInstanceOf[js.Dynamic].RoomPosition)(x, y, roomName).asInstanceOf[RoomPosition]
       }
-      def unapply(p: RoomPosition): Option[(Double, Double, String)] = Some((p.x, p.y, p.roomName))
+      def unapply(p: RoomPosition): Option[(Int, Int, String)] = Some((p.x, p.y, p.roomName))
     }
 
     val jsObj = js.Dynamic.literal

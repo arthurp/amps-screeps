@@ -5,6 +5,5 @@ import scala.scalajs.js.annotation._
 
 @js.native
 trait Console extends js.Object {
-  def log(text: String): js.Any
+  def log(os: Any): js.Any
 }
-
