@@ -2,6 +2,7 @@ package org.singingwizard.screeps.api
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
+import scala.scalajs.js.|
 
 @js.native
 trait PathFinderResult extends js.Object {
@@ -10,7 +11,7 @@ trait PathFinderResult extends js.Object {
 }
 
 @JSExportAll
-case class Goal(pos: RoomPosition, range: Int) {
+case class PathFinderGoal(pos: RoomPosition, range: Int) {
 }
 
 @js.native
@@ -35,15 +36,12 @@ trait PathFinderOps extends js.Object {
 
 @js.native
 trait PathFinder extends js.Object {
-  // TODO: Add opts optional arguments
-  def search(origin: RoomPosition, goal: RoomPosition): PathFinderResult
-  def search(origin: RoomPosition, goal: Goal): PathFinderResult
-  // TODO: Add other overloads for goal
+  def search(origin: RoomPosition, goal: RoomPosition | PathFinderGoal, opts: PathFinderOps = ???): PathFinderResult
 
-  /*
-  def search(origin: RoomPosition, goal: RoomPosition | js.Any, opts: PathFinderOps = ???): js.Any = js.native
-  def search(origin: RoomPosition, goal: js.Array[RoomPosition] | js.Array[js.Any], opts: PathFinderOps = ???): js.Any = js.native
-	*/
+  @JSName("search")
+  def searchNearest(origin: RoomPosition,
+                    goal: js.Array[RoomPosition] | js.Array[PathFinderGoal] | js.Array[js.Any],
+                    opts: PathFinderOps = ???): PathFinderResult
 
   def use(isEnabled: Boolean): Unit
 }

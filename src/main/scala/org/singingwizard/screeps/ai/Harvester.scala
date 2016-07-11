@@ -17,12 +17,12 @@ class Harvester()(implicit ctx: ScreepsContext) extends Role {
       }
       true
     } else {
-      val targets = creep.room.find(FIND_STRUCTURES, jsObj(filter = (structure: js.Dynamic) =>
-        {
+      val targets = creep.room.find[Structure](FIND_STRUCTURES, jsObj(filter = (structure: js.Dynamic) => {
           (structure.structureType == STRUCTURE_EXTENSION ||
             structure.structureType == STRUCTURE_SPAWN ||
-            structure.structureType == STRUCTURE_TOWER) && structure.energy.asInstanceOf[Int] < structure.energyCapacity.asInstanceOf[Int]
-        }))
+            structure.structureType == STRUCTURE_TOWER) && structure.asInstanceOf[js.Dynamic].energy.asInstanceOf[Int] < structure.asInstanceOf[js.Dynamic].energyCapacity.asInstanceOf[Int]
+      }))
+      Console.log(targets.toString())
       if (targets.length > 0) {
         if (creep.transfer(targets(0), RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
           creep.moveTo(targets(0));

@@ -7,18 +7,15 @@ import js.|
 // Derived from TypeScript types from:
 // https://github.com/screepers/Screeps-Typescript-Declarations @ 2d48f03149153f98806f35fe284fd2878c23d497
 
-// TODO: Convert Doubles to Ints in appropriate places (most of them are appropriate I think).
-// TODO: Figure out how to deal with overload and default arguments problems.
-
 @js.native
 trait ConstructionSite extends RoomObject {
   var id: String
   var my: Boolean
   var owner: Owner
-  var progress: Double
-  var progressTotal: Double
+  var progress: Int
+  var progressTotal: Int
   var structureType: String
-  def remove(): Double
+  def remove(): Int
 }
 
 @js.native
@@ -29,55 +26,56 @@ trait Storage extends StructureStorage {
 trait Creep extends RoomObject {
   var body: js.Array[BodyPartDefinition]
   var carry: StoreDefinition
-  var carryCapacity: Double
-  var fatigue: Double
-  var hits: Double
-  var hitsMax: Double
+  var carryCapacity: Int
+  var fatigue: Int
+  var hits: Int
+  var hitsMax: Int
   var id: String
   var memory: js.Dynamic
   var my: Boolean
   var name: String
   var owner: Owner
   var spawning: Boolean
-  var ticksToLive: Double
-  def attack(target: Creep | Spawn | Structure): Double
-  def attackController(target: Structure): Double
-  def build(target: ConstructionSite): Double
-  def cancelOrder(methodName: String): Double
-  def claimController(target: StructureController): Double
-  def dismantle(target: Spawn | Structure): Double
-  def drop(resourceType: String, amount: Double = ???): Double
-  def getActiveBodyparts(typ: String): Double
-  def harvest(target: Source | Mineral): Double
-  def heal(target: Creep): Double
-  def move(direction: Double): Double
-  def moveByPath(path: js.Array[PathStep] | js.Any | String): Double
-  //def moveTo(x: Double, y: Double, opts: MoveToOpts | PathFinderOps = ???): Double
-  def moveTo(target: RoomPosition | js.Any, opts: MoveToOpts | PathFinderOps = ???): Double
-  def notifyWhenAttacked(enabled: Boolean): Double
-  def pickup(target: Resource): Double
-  def rangedAttack(target: Creep | Spawn | Structure): Double
-  def rangedHeal(target: Creep): Double
-  def rangedMassAttack(): Double
-  def repair(target: Spawn | Structure): Double
-  def reserveController(target: StructureController): Double
-  def say(message: String): Double
-  def suicide(): Double
-  def transfer(target: Creep | Spawn | Structure, resourceType: String, amount: Double = ???): Double
-  def upgradeController(target: StructureController): Double
+  var ticksToLive: Int
+  def attack(target: Creep | Spawn | Structure): Int
+  def attackController(target: Structure): Int
+  def build(target: ConstructionSite): Int
+  def cancelOrder(methodName: String): Int
+  def claimController(target: StructureController): Int
+  def dismantle(target: Spawn | Structure): Int
+  def drop(resourceType: String, amount: Int = ???): Int
+  def getActiveBodyparts(typ: String): Int
+  def harvest(target: Source | Mineral): Int
+  def heal(target: Creep): Int
+  def move(direction: Int): Int
+  def moveByPath(path: js.Array[PathStep] | js.Array[RoomPosition] | String): Int
+  @JSName("moveTo")
+  def moveToCoords(x: Int, y: Int, opts: MoveToOpts | PathFinderOps = ???): Int
+  def moveTo(target: RoomPosition | js.Any, opts: MoveToOpts | PathFinderOps = ???): Int
+  def notifyWhenAttacked(enabled: Boolean): Int
+  def pickup(target: Resource): Int
+  def rangedAttack(target: Creep | Spawn | Structure): Int
+  def rangedHeal(target: Creep): Int
+  def rangedMassAttack(): Int
+  def repair(target: Spawn | Structure): Int
+  def reserveController(target: StructureController): Int
+  def say(message: String): Int
+  def suicide(): Int
+  def transfer(target: Creep | Spawn | Structure, resourceType: String, amount: Int = ???): Int
+  def upgradeController(target: StructureController): Int
 }
 
 @js.native
 trait Flag extends RoomObject {
-  var color: Double
+  var color: Int
   var memory: js.Dynamic
   var name: String
   var roomName: String
-  var secondaryColor: Double
+  var secondaryColor: Int
   def remove(): Unit
-  def setColor(color: String, secondaryColor: String = ???): Double
-  def setPosition(x: Double, y: Double): Double
-  def setPosition(pos: RoomPosition | js.Any): Double
+  def setColor(color: String, secondaryColor: String = ???): Int
+  def setPosition(x: Int, y: Int): Int
+  def setPosition(pos: RoomPosition | js.Any): Int
 }
 
 @js.native
@@ -92,24 +90,24 @@ trait Game extends js.Object {
   var spawns: js.Dictionary[Spawn]
   var structures: js.Dictionary[Structure]
   var constructionSites: js.Dictionary[ConstructionSite]
-  var time: Double
+  var time: Int
   def getObjectById[T](id: String): T
-  def notify(message: String, groupInterval: Double): Unit
+  def notify(message: String, groupInterval: Int): Unit
 }
 
 @js.native
 trait GlobalControlLevel extends js.Object {
-  var level: Double
-  var progress: Double
-  var progressTotal: Double
+  var level: Int
+  var progress: Int
+  var progressTotal: Int
 }
 
 @js.native
 trait CPU extends js.Object {
-  var limit: Double
-  var tickLimit: Double
-  var bucket: Double
-  def getUsed(): Double
+  var limit: Int
+  var tickLimit: Int
+  var bucket: Int
+  def getUsed(): Int
 }
 
 @js.native
@@ -117,7 +115,7 @@ trait BodyPartDefinition extends js.Object {
   var boost: String
   @JSName("type")
   var typ: String
-  var hits: Double
+  var hits: Int
 }
 
 @js.native
@@ -128,23 +126,23 @@ trait Owner extends js.Object {
 @js.native
 trait ReservationDefinition extends js.Object {
   var username: String
-  var ticksToEnd: Double
+  var ticksToEnd: Int
 }
 
 @js.native
 trait StoreDefinition extends js.Object {
   @JSBracketAccess
-  def apply(resource: String): Double
+  def apply(resource: String): Int
   @JSBracketAccess
-  def update(resource: String, v: Double): Unit
-  var energy: Double
-  var power: Double
+  def update(resource: String, v: Int): Unit
+  var energy: Int
+  var power: Int
 }
 
 @js.native
 trait LookAtResultWithPos extends js.Object {
-  var x: Double
-  var y: Double
+  var x: Int
+  var y: Int
   @JSName("type")
   var typ: String
   var creep: Creep
@@ -156,10 +154,11 @@ trait LookAtResultWithPos extends js.Object {
 trait LookAtResult extends js.Object {
   @JSName("type")
   var typ: String
+  // TODO: Only one of these will actually be available.
   var constructionSite: ConstructionSite
   var creep: Creep
   var energy: Resource
-  var exit: js.Any
+  var exit: js.Dynamic // TODO: Make this a real type once it's documented.
   var flag: Flag
   var source: Source
   var structure: Structure
@@ -169,9 +168,9 @@ trait LookAtResult extends js.Object {
 @js.native
 trait LookAtResultMatrix extends js.Object {
   @JSBracketAccess
-  def apply(coord: Double): LookAtResultMatrix | js.Array[LookAtResult]
+  def apply(coord: Int): LookAtResultMatrix | js.Array[LookAtResult]
   @JSBracketAccess
-  def update(coord: Double, v: LookAtResultMatrix | js.Array[LookAtResult]): Unit
+  def update(coord: Int, v: LookAtResultMatrix | js.Array[LookAtResult]): Unit
 }
 
 @js.native
@@ -181,41 +180,47 @@ trait FindPathOpts extends js.Object {
   var ignoreRoads: Boolean
   var ignore: js.Array[js.Any] | js.Array[RoomPosition]
   var avoid: js.Array[js.Any] | js.Array[RoomPosition]
-  var maxOps: Double
-  var heuristicWeight: Double
+  var maxOps: Int
+  var heuristicWeight: Int
   var serialize: Boolean
-  var maxRooms: Double
+  var maxRooms: Int
 }
 
 @js.native
 trait MoveToOpts extends js.Object {
-  var reusePath: Double
+  var reusePath: Int
   var noPathFinding: Boolean
 }
 
 @js.native
 trait PathStep extends js.Object {
-  var x: Double
-  var dx: Double
-  var y: Double
-  var dy: Double
-  var direction: Double
+  var x: Int
+  var dx: Int
+  var y: Int
+  var dy: Int
+  var direction: Int
 }
 
 @js.native
 trait SurvivalGameInfo extends js.Object {
-  var score: Double
-  var timeToWave: Double
-  var wave: Double
+  var score: Int
+  var timeToWave: Int
+  var wave: Int
+}
+
+@js.native
+trait RoomRoute extends js.Object {
+  val exit: Int
+  val room: String
 }
 
 @js.native
 trait GameMap extends js.Object {
   def describeExits(roomName: String): js.Any
-  def findExit(fromRoom: String | Room, toRoom: String | Room): String | Double
-  def findRoute(fromRoom: String | Room, toRoom: String | Room): js.Array[js.Any] | Double
-  def getRoomLinearDistance(roomName1: String, roomName2: String): Double
-  def getTerrainAt(x: Double, y: Double, roomName: String): String
+  def findExit(fromRoom: String | Room, toRoom: String | Room): String | Int
+  def findRoute(fromRoom: String | Room, toRoom: String | Room): js.Array[RoomRoute] | Int
+  def getRoomLinearDistance(roomName1: String, roomName2: String): Int
+  def getTerrainAt(x: Int, y: Int, roomName: String): String
   def getTerrainAt(pos: RoomPosition): String
   def isRoomProtected(roomName: String): Boolean
 }
@@ -229,11 +234,11 @@ trait Market extends js.Object {
 @js.native
 trait Transaction extends js.Object {
   var transactionId: String
-  var time: Double
-  var sender: js.Any
-  var recipient: js.Any
+  var time: Int
+  var sender: Owner
+  var recipient: Owner
   var resourceType: String
-  var amount: Double
+  var amount: Int
   var from: String
   var to: String
   var description: String
@@ -241,10 +246,10 @@ trait Transaction extends js.Object {
 
 @js.native
 trait Mineral extends RoomObject {
-  var mineralAmount: Double
+  var mineralAmount: Int
   var mineralType: String
   var id: String
-  var ticksToRegeneration: Double
+  var ticksToRegeneration: Int
 }
 
 @js.native
@@ -255,7 +260,7 @@ trait RawMemory extends js.Object {
 
 @js.native
 trait Resource extends RoomObject {
-  var amount: Double
+  var amount: Int
   var id: String
   var resourceType: String
 }
@@ -267,49 +272,63 @@ trait RoomObject extends js.Object {
 }
 
 @js.native
+trait RoomFindOpts[T] extends js.Object {
+  val filter: (T) => Boolean
+}
+
+@js.native
 trait Room extends js.Object {
   var controller: StructureController
-  var energyAvailable: Double
-  var energyCapacityAvailable: Double
+  var energyAvailable: Int
+  var energyCapacityAvailable: Int
   var memory: js.Dynamic
   var mode: String
   var name: String
   var storage: StructureStorage
   var survivalInfo: SurvivalGameInfo
   var terminal: StructureTerminal
-  def createConstructionSite(x: Double, y: Double, structureType: String): Double
-  //def createConstructionSite(pos: RoomPosition | js.Any, structureType: String): Double
-  def createFlag(x: Double, y: Double, name: String, color: String, secondaryColor: String = ???): Double
-  //def createFlag(pos: RoomPosition | js.Any, name: String, color: String, secondaryColor: String = ???): Double
-  def find[T](typ: Double, opts: js.Any = ???): js.Array[T]
-  def findExitTo(room: String | Room): String | Double
+  @JSName("createConstructionSite")
+  def createConstructionSiteCoords(x: Int, y: Int, structureType: String): Int
+  def createConstructionSite(pos: RoomPosition | js.Any, structureType: String): Int
+  @JSName("createFlag")
+  def createFlagCoords(x: Int, y: Int, name: String, color: String, secondaryColor: String = ???): Int
+  def createFlag(pos: RoomPosition | js.Any, name: String, color: String, secondaryColor: String = ???): Int
+  def find[T](typ: Int, opts: js.Any = ???): js.Array[T]
+  def findExitTo(room: String | Room): String | Int
   def findPath(fromPos: RoomPosition, toPos: RoomPosition, opts: FindPathOpts = ???): js.Array[PathStep]
-  def getPositionAt(x: Double, y: Double): RoomPosition
-  def lookAt(x: Double, y: Double): js.Array[LookAtResult]
+  def getPositionAt(x: Int, y: Int): RoomPosition
+  def lookAt(x: Int, y: Int): js.Array[LookAtResult]
   def lookAt(target: RoomPosition | js.Any): js.Array[LookAtResult]
-  def lookAtArea(top: Double, left: Double, bottom: Double, right: Double, asArray: Boolean = ???): LookAtResultMatrix | js.Array[LookAtResultWithPos]
-  def lookForAt[T](typ: String, x: Double, y: Double): js.Array[T]
+  def lookAtArea(top: Int, left: Int, bottom: Int, right: Int, asArray: Boolean = ???): LookAtResultMatrix | js.Array[LookAtResultWithPos]
+  def lookForAt[T](typ: String, x: Int, y: Int): js.Array[T]
   def lookForAt[T](typ: String, target: RoomPosition | js.Any): js.Array[T]
-  def lookForAtArea(typ: String, top: Double, left: Double, bottom: Double, right: Double, asArray: Boolean = ???): LookAtResultMatrix | js.Array[LookAtResultWithPos]
+  def lookForAtArea(typ: String, top: Int, left: Int, bottom: Int, right: Int, asArray: Boolean = ???): LookAtResultMatrix | js.Array[LookAtResultWithPos]
   def serializePath(path: js.Array[PathStep]): String
 }
 
 @js.native
 trait Source extends js.Object {
-  var energy: Double
-  var energyCapacity: Double
+  var energy: Int
+  var energyCapacity: Int
   var id: String
   var pos: RoomPosition
   var room: Room
-  var ticksToRegeneration: Double
+  var ticksToRegeneration: Int
+}
+
+@js.native
+trait SpawningResult extends js.Object {
+  val name: String
+  val needTime: Int
+  val remainingTime: Int
 }
 
 @js.native
 trait Spawn extends OwnedStructure {
-  var energy: Double
-  var energyCapacity: Double
-  var hits: Double
-  var hitsMax: Double
+  var energy: Int
+  var energyCapacity: Int
+  var hits: Int
+  var hitsMax: Int
   var id: String
   var memory: js.Dynamic
   var my: Boolean
@@ -318,26 +337,26 @@ trait Spawn extends OwnedStructure {
   var pos: RoomPosition
   var room: Room
   var structureType: String
-  var spawning: js.Any
-  def canCreateCreep(body: js.Array[String], name: String = ???): Double
+  var spawning: SpawningResult
+  def canCreateCreep(body: js.Array[String], name: String = ???): Int
   def createCreep(body: js.Array[String], name: String = ???, memory: js.Any = ???): Int | String
-  def destroy(): Double
+  def destroy(): Int
   def isActive(): Boolean
-  def notifyWhenAttacked(enabled: Boolean): Double
-  def renewCreep(target: Creep): Double
-  def recycleCreep(target: Creep): Double
-  def transferEnergy(target: Creep, amount: Double = ???): Double
+  def notifyWhenAttacked(enabled: Boolean): Int
+  def renewCreep(target: Creep): Int
+  def recycleCreep(target: Creep): Int
+  def transferEnergy(target: Creep, amount: Int = ???): Int
 }
 
 @js.native
 trait Structure extends RoomObject {
-  var hits: Double
-  var hitsMax: Double
+  var hits: Int
+  var hitsMax: Int
   var id: String
   var structureType: String
-  def destroy(): Double
+  def destroy(): Int
   def isActive(): Boolean
-  def notifyWhenAttacked(enabled: Boolean): Double
+  def notifyWhenAttacked(enabled: Boolean): Int
 }
 
 @js.native
@@ -348,89 +367,89 @@ trait OwnedStructure extends Structure {
 
 @js.native
 trait StructureController extends OwnedStructure {
-  var level: Double
-  var progress: Double
-  var progressTotal: Double
+  var level: Int
+  var progress: Int
+  var progressTotal: Int
   var reservation: ReservationDefinition
-  var ticksToDowngrade: Double
-  def unclaim(): Double
+  var ticksToDowngrade: Int
+  def unclaim(): Int
 }
 
 @js.native
 trait StructureExtension extends OwnedStructure {
-  var energy: Double
-  var energyCapacity: Double
-  def transferEnergy(target: Creep, amount: Double = ???): Double
+  var energy: Int
+  var energyCapacity: Int
+  def transferEnergy(target: Creep, amount: Int = ???): Int
 }
 
 @js.native
 trait StructureLink extends OwnedStructure {
-  var cooldown: Double
-  var energy: Double
-  var energyCapacity: Double
-  def transferEnergy(target: Creep | StructureLink, amount: Double = ???): Double
+  var cooldown: Int
+  var energy: Int
+  var energyCapacity: Int
+  def transferEnergy(target: Creep | StructureLink, amount: Int = ???): Int
 }
 
 @js.native
 trait StructureKeeperLair extends OwnedStructure {
-  var ticksToSpawn: Double
+  var ticksToSpawn: Int
 }
 
 @js.native
 trait StructureObserver extends OwnedStructure {
-  def observerRoom(roomName: String): Double
+  def observerRoom(roomName: String): Int
 }
 
 @js.native
 trait StructurePowerBank extends OwnedStructure {
-  var power: Double
-  var ticksToDecay: Double
+  var power: Int
+  var ticksToDecay: Int
 }
 
 @js.native
 trait StructurePowerSpawn extends OwnedStructure {
-  var energy: Double
-  var energyCapacity: Double
-  var power: Double
-  var powerCapacity: Double
-  def createPowerCreep(name: String): Double
-  def processPower(): Double
-  def transferEnergy(target: Creep, amount: Double = ???): Double
+  var energy: Int
+  var energyCapacity: Int
+  var power: Int
+  var powerCapacity: Int
+  def createPowerCreep(name: String): Int
+  def processPower(): Int
+  def transferEnergy(target: Creep, amount: Int = ???): Int
 }
 
 @js.native
 trait StructureRampart extends OwnedStructure {
-  var ticksToDecay: Double
+  var ticksToDecay: Int
   var isPublic: Boolean
   def setPublic(isPublic: Boolean): js.Dynamic
 }
 
 @js.native
 trait StructureRoad extends Structure {
-  var ticksToDecay: Double
+  var ticksToDecay: Int
 }
 
 @js.native
 trait StructureStorage extends OwnedStructure {
   var store: StoreDefinition
-  var storeCapacity: Double
-  def transfer(target: Creep, resourceType: String, amount: Double = ???): Double
-  def transferEnergy(target: Creep, amount: Double = ???): Double
+  var storeCapacity: Int
+  def transfer(target: Creep, resourceType: String, amount: Int = ???): Int
+  def transferEnergy(target: Creep, amount: Int = ???): Int
 }
 
 @js.native
 trait StructureTower extends OwnedStructure {
-  var energy: Double
-  var energyCapacity: Double
-  def attack(target: Creep): Double
-  def heal(target: Creep): Double
-  def repair(target: Spawn | Structure): Double
-  def transferEnergy(target: Creep, amount: Double = ???): Double
+  var energy: Int
+  var energyCapacity: Int
+  def attack(target: Creep): Int
+  def heal(target: Creep): Int
+  def repair(target: Spawn | Structure): Int
+  def transferEnergy(target: Creep, amount: Int = ???): Int
 }
 
 @js.native
 trait StructureWall extends Structure {
-  var ticksToLive: Double
+  var ticksToLive: Int
 }
 
 @js.native
@@ -439,27 +458,27 @@ trait StructureExtractor extends OwnedStructure {
 
 @js.native
 trait StructureLab extends OwnedStructure {
-  var energy: Double
-  var energyCapacity: Double
-  var mineralAmount: Double
+  var energy: Int
+  var energyCapacity: Int
+  var mineralAmount: Int
   var mineralType: String
-  var mineralCapacity: Double
-  def boostCreep(creep: Creep, bodyPartsCount: Double = ???): Double
-  def runReaction(lab1: StructureLab, lab2: StructureLab): Double
-  def transfer(target: Creep, resourceType: String, amount: Double = ???): Double
+  var mineralCapacity: Int
+  def boostCreep(creep: Creep, bodyPartsCount: Int = ???): Int
+  def runReaction(lab1: StructureLab, lab2: StructureLab): Int
+  def transfer(target: Creep, resourceType: String, amount: Int = ???): Int
 }
 
 @js.native
 trait StructureTerminal extends OwnedStructure {
-  var store: js.Any
-  var storeCapacity: Double
-  def send(resourceType: String, amount: Double, destination: String, description: String = ???): Double
-  def transfer(target: Creep, resourceType: String, amount: Double = ???): Double
+  var store: js.Dictionary[Int]
+  var storeCapacity: Int
+  def send(resourceType: String, amount: Int, destination: String, description: String = ???): Int
+  def transfer(target: Creep, resourceType: String, amount: Int = ???): Int
 }
 
 @js.native
 trait StructureContainer extends Structure {
-  var store: js.Any
-  var storeCapacity: Double
-  def transfer(target: Creep, resourceType: String, amount: Double = ???): Double
+  var store: js.Dictionary[Int]
+  var storeCapacity: Int
+  def transfer(target: Creep, resourceType: String, amount: Int = ???): Int
 }
