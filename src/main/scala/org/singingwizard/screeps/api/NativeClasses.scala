@@ -3,6 +3,7 @@ package org.singingwizard.screeps.api
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
 import js.|
+import scala.scalajs.js.UndefOr
 
 // Derived from TypeScript types from:
 // https://github.com/screepers/Screeps-Typescript-Declarations @ 2d48f03149153f98806f35fe284fd2878c23d497
@@ -282,12 +283,12 @@ trait RoomObject extends js.Object {
 }
 
 @js.native
-trait RoomFindOpts[T] extends js.Object {
+trait FindFilter[T] extends js.Object {
   val filter: (T) => Boolean
 }
 
-object RoomFindOpts {
-  def apply[T](f: (T) => Boolean): RoomFindOpts[T] = js.Dynamic.literal("filter" -> f).asInstanceOf[RoomFindOpts[T]]
+object FindFilter {
+  def apply[T](f: (T) => Boolean): FindFilter[T] = js.Dynamic.literal("filter" -> f).asInstanceOf[FindFilter[T]]
 }
 
 @js.native
@@ -307,7 +308,7 @@ trait Room extends js.Object {
   @JSName("createFlag")
   def createFlagCoords(x: Int, y: Int, name: String, color: String, secondaryColor: String = ???): Int
   def createFlag(pos: RoomPosition | js.Any, name: String, color: String, secondaryColor: String = ???): Int
-  def find[T](typ: Int, opts: RoomFindOpts[T] = ???): js.Array[T]
+  def find[T](typ: Int, opts: FindFilter[T] = ???): js.Array[T]
   def findExitTo(room: String | Room): String | Int
   def findPath(fromPos: RoomPosition, toPos: RoomPosition, opts: FindPathOpts = ???): js.Array[PathStep]
   def getPositionAt(x: Int, y: Int): RoomPosition
@@ -321,6 +322,25 @@ trait Room extends js.Object {
 }
 
 @js.native
+trait FindFilterAlgorithm[T] extends FindFilter[T] {
+  val filter: (T) => Boolean
+  val algorithm: UndefOr[String]
+}
+
+object FindFilterAlgorithm {
+  import scala.language.implicitConversions
+  def apply[T](f: (T) => Boolean, algo: String): FindFilterAlgorithm[T] = 
+    js.Dynamic.literal("filter" -> f, "algorithm" -> algo).asInstanceOf[FindFilterAlgorithm[T]]
+  
+  // TODO: This is a dangerous hack I think. The member algorithm is not set. This may cause runtime errors.
+  def apply[T](f: (T) => Boolean): FindFilterAlgorithm[T] = 
+    js.Dynamic.literal("filter" -> f).asInstanceOf[FindFilterAlgorithm[T]]
+  
+  implicit def FindFilter2FindFilterAlgorithm[T](f: FindFilter[T]): FindFilterAlgorithm[T] =
+    apply(f.filter)
+}
+
+@js.native
 trait RoomPosition extends js.Object {
   val x: Int
   val y: Int
@@ -329,17 +349,17 @@ trait RoomPosition extends js.Object {
   def createConstructionSite(structureType: String): Double
   def createFlag(name: String = ???, color: Double = ???, secondaryColor: Double = ???): Double
   
-  def findClosestByPath[T](typ: Int, opts: js.Any = ???): T
+  def findClosestByPath[T](typ: Int, opts: FindFilterAlgorithm[T] = ???): T
   @JSName("findClosestByPath")
-  def findClosestByPathFrom[T](objects: js.Array[T] | js.Array[RoomPosition], opts: js.Any = ???): T
+  def findClosestByPathFrom[T](objects: js.Array[T] | js.Array[RoomPosition], opts: FindFilterAlgorithm[T] = ???): T
   
-  def findClosestByRange[T](typ: Int, opts: js.Any = ???): T
+  def findClosestByRange[T](typ: Int, opts: FindFilter[T] = ???): T
   @JSName("findClosestByRange")
-  def findClosestByRangeFrom[T](objects: js.Array[T] | js.Array[RoomPosition], opts: js.Any = ???): T
+  def findClosestByRangeFrom[T](objects: js.Array[T] | js.Array[RoomPosition], opts: FindFilter[T] = ???): T
   
-  def findInRange[T](typ: Int, range: Int, opts: js.Any = ???): js.Array[T]
+  def findInRange[T](typ: Int, range: Int, opts: FindFilter[T] = ???): js.Array[T]
   @JSName("findInRange")
-  def findInRangeFrom[T](objects: js.Array[T] | js.Array[RoomPosition], range: Double, opts: js.Any = ???): js.Array[T]
+  def findInRangeFrom[T](objects: js.Array[T] | js.Array[RoomPosition], range: Double, opts: FindFilter[T] = ???): js.Array[T]
   
   //def findPathTo(x: Double, y: Double, opts: FindPathOpts = ???): js.Array[PathStep]
   def findPathTo(target: RoomPosition | js.Any, opts: FindPathOpts = ???): js.Array[PathStep]
