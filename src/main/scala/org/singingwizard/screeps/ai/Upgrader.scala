@@ -21,11 +21,15 @@ class Upgrader(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
       }
       true
     } else {
-      val source = selectSource(creep)
-      if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(source)
+      selectSource(creep) match {
+        case Some(source) =>
+          if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source);
+          }
+          true
+        case None =>
+          false
       }
-      true
     }
   }
 }

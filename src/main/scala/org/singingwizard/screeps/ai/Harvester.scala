@@ -10,13 +10,17 @@ class Harvester(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
 
   def run(creep: Creep): Boolean = {
     if (creep.carry.energy < creep.carryCapacity) {
-      val source = selectSource(creep)
-      if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(source)
+      selectSource(creep) match {
+        case Some(source) =>
+          if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source)
+          }
+          true
+        case None =>
+          false
       }
-      true
     } else {
-      val targets = creep.room.find[Structure](FIND_STRUCTURES, RoomFindOpts(structure => {
+      val targets = creep.room.find[Structure](FIND_STRUCTURES, FindFilter(structure => {
         (structure.structureType == STRUCTURE_EXTENSION ||
           structure.structureType == STRUCTURE_SPAWN ||
           structure.structureType == STRUCTURE_TOWER) &&
@@ -24,7 +28,7 @@ class Harvester(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
       }))
       if (targets.length > 0) {
         if (creep.transfer(targets(0), RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-          creep.moveTo(targets(0));
+          creep.moveTo(targets(0))
         }
         true
       } else {

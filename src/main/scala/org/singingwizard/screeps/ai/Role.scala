@@ -12,14 +12,17 @@ trait Role {
 
   def run(creep: Creep): Boolean
 
-  def selectSource(creep: Creep) = {
+  def selectSource(creep: Creep): Option[Source] = {
     val nearSource = creep.pos.findInRange[Source](FIND_SOURCES, 3)
     nearSource.headOption match {
-      case Some(s) => s
+      case Some(s) => Some(s)
       case None =>
         val rd = loop.roomData(creep.room)
-        val sources = rd.sources.filter(_.positions > 0).map(_.source.get())
-        creep.pos.findClosestByRangeFrom[Source](sources.toJSArray)
+        val sources = rd.sources.filter(_.positions > 0).map(_.source.get()).filter(_.pos.findInRange(FIND_HOSTILE_CREEPS, 5).size == 0)
+        if (sources.size > 0)
+          Some(creep.pos.findClosestByRangeFrom[Source](sources.toJSArray))
+        else
+          None
     }
   }
 }

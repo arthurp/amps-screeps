@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "utest" % "0.3.0" % "test"
 )
 
+scalacOptions ++= Seq("-feature")
 
 val packageJS = taskKey[File]("Package the Screeps JS.")
 val packageFastJS = taskKey[File]("Package the Screeps JS (using fastOptJS version).")

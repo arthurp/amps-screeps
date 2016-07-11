@@ -15,9 +15,9 @@ class Loop()(implicit val ctx: ScreepsContext) {
   val upgrader = new Upgrader(this)
   val builder = new Builder(this)
 
-  val MIN_HARVESTERS = 4
-  val MIN_UPGRADERS = 7
-  val MIN_BUILDERS = 7
+  val MIN_HARVESTERS = 5
+  val MIN_UPGRADERS = 6
+  val MIN_BUILDERS = 5
 
   case class SourceData(source: ObjectById[Source], positions: Int)
   case class RoomData(room: String, sources: Seq[SourceData])
@@ -51,23 +51,23 @@ class Loop()(implicit val ctx: ScreepsContext) {
   def loop(): Unit = {
     PathFinder.use(true)    
     roomDataCache.clear()
+    
+    val spawn = Game.spawns("Spawn1")
 
-    /*
-    var tower = Game.getObjectById('TOWER_ID');
-    if(tower) {
-        var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < structure.hitsMax
-        });
-        if(closestDamagedStructure) {
+    spawn.room.find[StructureTower](FIND_STRUCTURES).filter(_.structureType == STRUCTURE_TOWER).headOption match {
+      case Some(tower) =>
+        val closestDamagedStructure = tower.pos.findClosestByRange[Structure](FIND_STRUCTURES, 
+            FindFilter[Structure](structure => structure.hits < structure.hitsMax))
+        if(closestDamagedStructure != null) {
             tower.repair(closestDamagedStructure);
         }
 
-        var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if(closestHostile) {
+        val closestHostile = tower.pos.findClosestByRange[Creep](FIND_HOSTILE_CREEPS);
+        if(closestHostile != null) {
             tower.attack(closestHostile);
         }
+      case _ => ()
     }
-    */
 
     for ((name, creep) <- Game.creeps) {
       val working = creep.memory.role.asInstanceOf[String] match {
@@ -82,8 +82,6 @@ class Loop()(implicit val ctx: ScreepsContext) {
         creep.moveTo(waitPos)
       }
     }
-    
-    val spawn = Game.spawns("Spawn1")
 
     val creepCounts = Game.creeps.values.groupBy(_.memory.role.asInstanceOf[String]).mapValues(_.size).withDefaultValue(0)
     val spawnRules = Seq(
@@ -96,8 +94,12 @@ class Loop()(implicit val ctx: ScreepsContext) {
       (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE), "builder"),
       (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE), "builder"),
       (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, CARRY, CARRY, MOVE), "builder"),
+      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, CARRY, MOVE), "builder"),
+      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, CARRY, MOVE, MOVE), "builder"),
       (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE), "upgrader"),
-      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, WORK, CARRY, CARRY, MOVE), "upgrader"))
+      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, WORK, CARRY, CARRY, MOVE), "upgrader"),
+      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, WORK, CARRY, MOVE), "upgrader"),
+      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, CARRY, MOVE, MOVE), "upgrader"))
     val spawnPriority = spawnRules.filter(_._1).map(_._2)
 
     def spawnFromList(l: Seq[(js.Array[String], String)]): Unit = l match {

@@ -28,11 +28,15 @@ class Builder(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
         false
       }
     } else {
-      val source = selectSource(creep)
+      selectSource(creep) match {
+        case Some(source) =>
       if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
         creep.moveTo(source);
       }
-      true
+          true
+        case None =>
+          false
+      }
     }
   }
 }
