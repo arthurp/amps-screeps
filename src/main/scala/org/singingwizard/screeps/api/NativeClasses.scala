@@ -363,10 +363,10 @@ trait RoomPosition extends js.Object {
   
   //def findPathTo(x: Double, y: Double, opts: FindPathOpts = ???): js.Array[PathStep]
   def findPathTo(target: RoomPosition | js.Any, opts: FindPathOpts = ???): js.Array[PathStep]
-  def getDirectionTo(x: Int, y: Int): Double
-  def getDirectionTo(target: RoomPosition | js.Any): Double
-  def getRangeTo(x: Int, y: Int): Double
-  def getRangeTo(target: RoomPosition | js.Any): Double
+  def getDirectionTo(x: Int, y: Int): Int
+  def getDirectionTo(target: RoomPosition | js.Any): Int
+  def getRangeTo(x: Int, y: Int): Int
+  def getRangeTo(target: RoomPosition | js.Any): Int
   def inRangeTo(toPos: RoomPosition, range: Double): Boolean
   def isEqualTo(x: Int, y: Int): Boolean
   def isEqualTo(target: RoomPosition | js.Any): Boolean
