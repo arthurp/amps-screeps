@@ -15,8 +15,8 @@ class Loop()(implicit val ctx: ScreepsContext) {
   val upgrader = new Upgrader(this)
   val builder = new Builder(this)
 
-  val MIN_HARVESTERS = 5
-  val MIN_UPGRADERS = 6
+  val MIN_HARVESTERS = 6
+  val MIN_UPGRADERS = 2
   val MIN_BUILDERS = 5
 
   case class SourceData(source: ObjectById[Source], positions: Int)
@@ -28,12 +28,12 @@ class Loop()(implicit val ctx: ScreepsContext) {
     val room = s.room
     val RoomPosition(x, y, _) = s.pos
     val area = room.lookAtArea(y - 1, x - 1, y + 1, x + 1).asInstanceOf[LookAtResultMatrix]
-    val positions = 8 - (for(i <- y-1 to y+1; j <- x-1 to x+1 if i != y || j != x) yield {
+    val positions = 8 - (for (i <- y - 1 to y + 1; j <- x - 1 to x + 1 if i != y || j != x) yield {
       val l = area(i)(j)
       l.exists((r: LookAtResult) => {
-        r.typ == "creep" || 
-        (r.typ == "terrain" && r.terrain == "wall") ||
-        (r.typ == "structure" && r.structure.structureType != STRUCTURE_ROAD && r.structure.structureType != STRUCTURE_RAMPART)
+        r.typ == "creep" ||
+          (r.typ == "terrain" && r.terrain == "wall") ||
+          (r.typ == "structure" && r.structure.structureType != STRUCTURE_ROAD && r.structure.structureType != STRUCTURE_RAMPART)
       })
     }).count(x => x)
     SourceData(ObjectById(s), positions)
@@ -47,24 +47,26 @@ class Loop()(implicit val ctx: ScreepsContext) {
   def creepCost(parts: Seq[String]) = {
     parts.map(BODYPART_COST(_)).sum
   }
-  
+
   def loop(): Unit = {
-    PathFinder.use(true)    
+    PathFinder.use(true)
     roomDataCache.clear()
-    
+
     val spawn = Game.spawns("Spawn1")
 
     spawn.room.find[StructureTower](FIND_STRUCTURES).filter(_.structureType == STRUCTURE_TOWER).headOption match {
       case Some(tower) =>
-        val closestDamagedStructure = tower.pos.findClosestByRange[Structure](FIND_STRUCTURES, 
-            FindFilter[Structure](structure => structure.hits < structure.hitsMax))
-        if(closestDamagedStructure != null) {
-            tower.repair(closestDamagedStructure);
-        }
-
         val closestHostile = tower.pos.findClosestByRange[Creep](FIND_HOSTILE_CREEPS);
-        if(closestHostile != null) {
-            tower.attack(closestHostile);
+        if (closestHostile != null) {
+          tower.attack(closestHostile)
+        } else {
+          val closestDamagedStructure = tower.pos.findClosestByRange[Structure](FIND_STRUCTURES,
+            FindFilter[Structure](structure => {
+              structure.hits.getOrElse(Int.MaxValue) < structure.hitsMax.getOrElse(Int.MaxValue)
+            }))
+          if (closestDamagedStructure != null) {
+            tower.repair(closestDamagedStructure);
+          }
         }
       case _ => ()
     }

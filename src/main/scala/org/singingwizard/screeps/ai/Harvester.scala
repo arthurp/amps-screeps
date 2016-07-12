@@ -26,9 +26,11 @@ class Harvester(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
           structure.structureType == STRUCTURE_TOWER) &&
           (structure.asInstanceOf[js.Dynamic].energy < structure.asInstanceOf[js.Dynamic].energyCapacity).asInstanceOf[Boolean]
       }))
+      
       if (targets.length > 0) {
-        if (creep.transfer(targets(0), RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-          creep.moveTo(targets(0))
+        val target = creep.pos.findClosestByRangeFrom[Structure](targets.toJSArray)
+        if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(target)
         }
         true
       } else {
