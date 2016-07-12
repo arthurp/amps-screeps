@@ -3,7 +3,7 @@ package org.singingwizard.screeps.ai
 import scalajs.js
 import org.singingwizard.screeps.api._
 import scala.scalajs.js.UndefOr
-
+/*
 class Builder(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
   import ctx._
   import ctxops._
@@ -40,3 +40,4 @@ class Builder(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
     }
   }
 }
+*/

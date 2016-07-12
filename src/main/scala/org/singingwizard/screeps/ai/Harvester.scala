@@ -3,7 +3,7 @@ package org.singingwizard.screeps.ai
 import scalajs.js
 import scalajs.js.JSConverters._
 import org.singingwizard.screeps.api._
-
+/*
 class Harvester(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
   import ctx._
   import ctxops._
@@ -39,3 +39,4 @@ class Harvester(val loop: Loop)(implicit val ctx: ScreepsContext) extends Role {
     }
   }
 }
+*/

@@ -2,7 +2,7 @@ package org.singingwizard.screeps.ai
 
 import org.singingwizard.screeps.api._
 import scalajs.js.JSConverters._
-
+/*
 trait Role {
   val loop: Loop
   implicit val ctx: ScreepsContext
@@ -26,3 +26,4 @@ trait Role {
     }
   }
 }
+*/

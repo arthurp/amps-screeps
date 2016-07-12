@@ -1,24 +1,25 @@
 package org.singingwizard.screeps.ai
 
 import scala.scalajs.js
+import scala.scalajs.js.{ UndefOr }
 import org.singingwizard.screeps.api._
 import org.singingwizard.screeps.wrappers._
+import org.singingwizard.screeps.wrappers.APIPickler._
 import scala.collection.mutable
+import org.singingwizard.screeps.ai.tasks.GetEnergy
+import prickle._
+import org.singingwizard.prickle.WeakRef
+import org.singingwizard.prickle.NativeJsConfig
+import scala.util.{ Try, Failure, Success }
 
 class Loop()(implicit val ctx: ScreepsContext) {
+  implicit val PrickleConfig = NativeJsConfig()
+
   val ctxops = new ScreepsContext.ScreepsContextOps(ctx)
   import ctx._
   import ctxops._
-  import LoDash._
 
-  val harvester = new Harvester(this)
-  val upgrader = new Upgrader(this)
-  val builder = new Builder(this)
-
-  val MIN_HARVESTERS = 6
-  val MIN_UPGRADERS = 2
-  val MIN_BUILDERS = 5
-
+  /*
   case class SourceData(source: ObjectById[Source], positions: Int)
   case class RoomData(room: String, sources: Seq[SourceData])
 
@@ -47,9 +48,74 @@ class Loop()(implicit val ctx: ScreepsContext) {
   def creepCost(parts: Seq[String]) = {
     parts.map(BODYPART_COST(_)).sum
   }
+  */
+
+  case class SourceData(source: Source, positions: Int)
 
   def loop(): Unit = {
     PathFinder.use(true)
+
+    val room = Game.spawns.values.head.room
+    val source = room.find[Source](FIND_SOURCES).head
+    val creep = Game.creeps.values.headOption
+
+    Memory.test.asInstanceOf[UndefOr[js.Any]].toOption match {
+      case Some(s) =>
+        Console.log(s)
+        val v = Unpickle[(Seq[String], SourceData, WeakRef[Creep])].from(s)
+        Console.log(v)
+      case _ =>
+        Console.log("Empty")
+    }
+
+    if (Game.creeps.size == 1) {
+      creep match {
+        case Some(creep) =>
+          Memory.test = Pickle((Set("String", "Other"), SourceData(source, 2), creep))
+        case None => ()
+      }
+      Console.log(Memory.test)
+    }
+
+    /*
+    var tasks = Queue[Task]()
+    var runningTasks = Set[RunningTask]()
+    var idleCreeps = Set[Creep]()
+
+    if (tasks.isEmpty && runningTasks.isEmpty) {
+      Console.log("Adding new tasks")
+      idleCreeps = Set()
+      for ((n, c) <- Game.creeps) {
+        tasks += new GetEnergy(c)
+        idleCreeps += c
+      }
+    }
+
+    if (!tasks.isEmpty && !idleCreeps.isEmpty) {
+      val t = tasks.dequeue()
+      val c = idleCreeps.minBy { c => t.costFor(c) }
+      try {
+        runningTasks += t.performWith(c)
+        Console.log(s"Running task $t with $c")
+      } catch {
+        case _: IllegalArgumentException => 
+          tasks += t // Requeue the task that we failed to run
+      }
+    }
+
+    for(t <- runningTasks.toSeq) {
+      t.run()
+      t.state match {
+        case RunningTask.Running(_) => ()
+        case s => 
+          Console.log(s"Finished task task $t ($s)")
+          runningTasks -= t
+      }
+    }
+    */
+  }
+
+  /*
     roomDataCache.clear()
 
     val spawn = Game.spawns("Spawn1")
@@ -70,54 +136,5 @@ class Loop()(implicit val ctx: ScreepsContext) {
         }
       case _ => ()
     }
-
-    for ((name, creep) <- Game.creeps) {
-      val working = creep.memory.role.asInstanceOf[String] match {
-        case "harvester" => harvester.run(creep)
-        case "upgrader"  => upgrader.run(creep)
-        case "builder"   => builder.run(creep)
-      }
-
-      val waitPos = Game.flags.get("WaitPoint").map(_.pos).getOrElse(RoomPosition(32, 32, creep.room.name))
-
-      if (!working && creep.pos.getRangeTo(waitPos) > 3) {
-        creep.moveTo(waitPos)
-      }
-    }
-
-    val creepCounts = Game.creeps.values.groupBy(_.memory.role.asInstanceOf[String]).mapValues(_.size).withDefaultValue(0)
-    val spawnRules = Seq(
-      (creepCounts("harvester") < MIN_HARVESTERS) -> (js.Array(WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE), "harvester"),
-      (creepCounts("harvester") < MIN_HARVESTERS) -> (js.Array(WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE), "harvester"),
-      (creepCounts("harvester") < MIN_HARVESTERS) -> (js.Array(WORK, CARRY, CARRY, MOVE, MOVE, MOVE), "harvester"),
-      (creepCounts("harvester") < MIN_HARVESTERS) -> (js.Array(WORK, CARRY, MOVE, MOVE), "harvester"),
-      (creepCounts("harvester") < MIN_HARVESTERS) -> (js.Array(WORK, CARRY, MOVE), "harvester"),
-      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE), "builder"),
-      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE), "builder"),
-      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE), "builder"),
-      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, CARRY, CARRY, MOVE), "builder"),
-      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, WORK, CARRY, MOVE), "builder"),
-      (creepCounts("builder") < MIN_BUILDERS) -> (js.Array(WORK, CARRY, MOVE, MOVE), "builder"),
-      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE), "upgrader"),
-      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, WORK, CARRY, CARRY, MOVE), "upgrader"),
-      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, WORK, CARRY, MOVE), "upgrader"),
-      (creepCounts("upgrader") < MIN_UPGRADERS) -> (js.Array(WORK, CARRY, MOVE, MOVE), "upgrader"))
-    val spawnPriority = spawnRules.filter(_._1).map(_._2)
-
-    def spawnFromList(l: Seq[(js.Array[String], String)]): Unit = l match {
-      case (parts, role) :: rest =>
-        (spawn.createCreep(parts, null, jsObj(role = role)): Any) match {
-          case _: String =>
-            Console.log(s"Successfully spawned ${parts.size} part ${role}")
-            ()
-          case _ =>
-            //Console.log(s"Failed to spawn ${parts.size} part ${role}")
-            spawnFromList(rest)
-        }
-      case Seq() =>
-        ()
-    }
-
-    spawnFromList(spawnPriority)
-  }
+   */
 }
