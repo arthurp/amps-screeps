@@ -7,14 +7,15 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
-persistLauncher in Compile := true
+//persistLauncher in Compile := true
 
-persistLauncher in Test := false
+//persistLauncher in Test := false
 
 testFrameworks += new TestFramework("utest.runner.Framework")
 
 libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.3.0" % "test"
+    "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
+    "com.github.benhutchison" %%% "prickle" % "1.1.10"
 )
 
 scalacOptions ++= Seq("-feature")
@@ -63,7 +64,7 @@ upload := {
   connection.setRequestProperty("Authorization", "Basic "+authToken)
   connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
 
-  val program = IO.read(packageFastJS.value)
+  val program = IO.read(packageJS.value)
   val quotedProgram = program.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"")
 
   val output = connection.getOutputStream()
