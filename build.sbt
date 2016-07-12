@@ -86,3 +86,13 @@ upload := {
   println(connection.asInstanceOf[HttpURLConnection].getResponseCode())
   println(connection.asInstanceOf[HttpURLConnection].getResponseMessage())
 }
+
+val measurePackages = taskKey[(Int, Int)]("Compute the size of the packages.")
+
+measurePackages := {
+  val fastSize = IO.read(packageFastJS.value).size
+  val fullSize = IO.read(packageJS.value).size
+  println(s"Fast optimized package is ${fastSize.toDouble / 1000}kB")
+  println(s"Full optimized package is ${fullSize.toDouble / 1000}kB")
+  (fastSize, fullSize)
+}
