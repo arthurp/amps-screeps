@@ -399,8 +399,6 @@ trait SpawningResult extends js.Object {
 trait Spawn extends OwnedStructure with HasID {
   val energy: Int
   val energyCapacity: Int
-  val hits: Int
-  val hitsMax: Int
   val id: String
   val memory: js.Dynamic
   val my: Boolean
@@ -422,8 +420,8 @@ trait Spawn extends OwnedStructure with HasID {
 
 @js.native
 trait Structure extends RoomObject with HasID {
-  val hits: Int
-  val hitsMax: Int
+  val hits: UndefOr[Int]
+  val hitsMax: UndefOr[Int]
   val id: String
   val structureType: String
   def destroy(): Int
