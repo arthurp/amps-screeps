@@ -4,10 +4,12 @@ import scalajs.js
 import scalajs.js.JSConverters._
 import org.singingwizard.screeps.ai._
 import org.singingwizard.screeps.api._
+import ScreepsContext._
+import prickle._
+import org.singingwizard.screeps.wrappers.APIPickler
 
-class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue) extends Task {
-  def findBestSource(p: RoomPosition)(implicit ctx: ScreepsContext): Source = {
-    import ctx._
+case class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue, var source: Option[Source] = None) extends Task {
+  def findBestSource(p: RoomPosition): Source = {
     val nearSource = creep.pos.findInRange[Source](FIND_SOURCES, 3)
     nearSource.headOption match {
       case Some(s) => s
@@ -22,7 +24,7 @@ class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue) extends Task {
     }
   }
 
-  def costFor(c: Creep)(implicit ctx: ScreepsContext): Int = {
+  def costFor(c: Creep)(implicit ctx: AIContext): Int = {
     import ctx._
     if (c != creep) {
       Int.MaxValue
@@ -36,29 +38,41 @@ class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue) extends Task {
 
   val idealCreep = None
 
-  def performWith(c: Creep)(implicit ctx: ScreepsContext): RunningTask = {
+  def assignCreep(c: Creep)(implicit ctx: AIContext): Unit = {
     import ctx._
-    val source = findBestSource(c.pos)
-    new RunningTask {
-      var done = false
-      
-      val creep: Creep = c
-      def run(): Unit = {
-        if(!done) {
-          if (creep.carry.energy >= (amount min c.carryCapacity)) {
-            done = true
-          } else if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source)
-          }
+    if (c != creep) {
+      throw new IllegalArgumentException(s"Cannot act with $c")
+    }
+    source = Some(findBestSource(c.pos))
+  }
+
+  def run()(implicit ctx: AIContext): Unit = {
+    import ctx._
+    source match {
+      case Some(s) =>
+        if (creep.carry.energy >= (amount min creep.carryCapacity)) {
+          source = None
+        } else if (creep.harvest(s) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(s)
         }
-      }
-      def state(implicit ctx: ScreepsContext): RunningTask.State = 
-        if (done) RunningTask.Complete else RunningTask.Running(None)
-      val task: Task = GetEnergy.this
+      case None => ()
     }
   }
   
+  def state: Task.State =
+    if (source.isDefined) Task.Complete else Task.Running(None)
+
   override def toString(): String = {
     s"GetEnergy for $creep"
   }
+}
+
+/**
+ * @author amp
+ */
+object GetEnergy {
+  import ScreepsContext._
+  import APIPickler._
+  
+  Task.pickler.concreteType[GetEnergy]
 }
