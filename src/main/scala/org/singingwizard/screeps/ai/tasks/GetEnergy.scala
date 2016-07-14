@@ -4,10 +4,14 @@ import scalajs.js
 import scalajs.js.JSConverters._
 import org.singingwizard.screeps.ai._
 import org.singingwizard.screeps.api._
+import ScreepsContext._
+import prickle._
+import org.singingwizard.screeps.wrappers.APIPickler
 
-class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue) extends Task {
-  def findBestSource(p: RoomPosition)(implicit ctx: ScreepsContext): Source = {
-    import ctx._
+case class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue,
+                     var _source: Option[Source] = None, var _assignedCreep: Option[Creep] = None,
+                     var state: Task.State = Task.NeedCreep) extends Task {
+  def findBestSource(p: RoomPosition): Source = {
     val nearSource = creep.pos.findInRange[Source](FIND_SOURCES, 3)
     nearSource.headOption match {
       case Some(s) => s
@@ -22,7 +26,7 @@ class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue) extends Task {
     }
   }
 
-  def costFor(c: Creep)(implicit ctx: ScreepsContext): Int = {
+  def costFor(c: Creep)(implicit ctx: AIContext): Int = {
     import ctx._
     if (c != creep) {
       Int.MaxValue
@@ -36,29 +40,40 @@ class GetEnergy(val creep: Creep, val amount: Int = Int.MaxValue) extends Task {
 
   val idealCreep = None
 
-  def performWith(c: Creep)(implicit ctx: ScreepsContext): RunningTask = {
+  def assignCreep(c: Creep)(implicit ctx: AIContext): Unit = {
     import ctx._
-    val source = findBestSource(c.pos)
-    new RunningTask {
-      var done = false
-      
-      val creep: Creep = c
-      def run(): Unit = {
-        if(!done) {
-          if (creep.carry.energy >= (amount min c.carryCapacity)) {
-            done = true
-          } else if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source)
-          }
+    if (c != creep) {
+      throw new IllegalArgumentException(s"Cannot act with $c")
+    }
+    state = Task.Running(None)
+    _source = Some(findBestSource(c.pos))
+  }
+
+  def run()(implicit ctx: AIContext): Unit = {
+    state match {
+      case Task.Running(_) =>
+        if (creep.carry.energy >= (amount min creep.carryCapacity)) {
+          state = Task.Complete
+        } else if (creep.harvest(_source.get) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(_source.get)
         }
-      }
-      def state(implicit ctx: ScreepsContext): RunningTask.State = 
-        if (done) RunningTask.Complete else RunningTask.Running(None)
-      val task: Task = GetEnergy.this
+      case _ => ()
     }
   }
-  
+
+  def assignedCreep = _assignedCreep
+
   override def toString(): String = {
-    s"GetEnergy for $creep"
+    s"GetEnergy for $creep ($state)"
+  }
+}
+
+/** @author amp
+  */
+object GetEnergy extends TaskCompanion {
+  import APIPickler._
+
+  def register(pickler: PicklerPair[Task]) = {
+    pickler.concreteType[GetEnergy]
   }
 }
