@@ -14,11 +14,11 @@ import scala.util.{ Try, Failure, Success }
 import AIContext._
 
 class Loop() {
-  implicit val PrickleConfig = NativeJsConfig()
-
   import ScreepsContext._
 
-  implicit val taskPickler = Task.pickler(GetEnergy) 
+  implicit val PrickleConfig = NativeJsConfig()
+
+  implicit val taskPickler = Task.pickler(GetEnergy)
 
   def loop(): Unit = {
     PathFinder.use(true)

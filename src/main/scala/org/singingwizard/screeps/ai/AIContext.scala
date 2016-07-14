@@ -32,11 +32,11 @@ case class AIContext(tasks: mutable.Set[Task] = mutable.Set()) {
   }
 
   def roomData(r: Room): RoomData = roomDataCache.getOrElseUpdate(r.name, computeRoomData(r))
-  */  
+  */
 }
 
 object AIContext {
-  implicit def mutablesetUnpickler[T](implicit unpickler: Unpickler[T]) =  new Unpickler[mutable.Set[T]] {
+  implicit def mutablesetUnpickler[T](implicit unpickler: Unpickler[T]) = new Unpickler[mutable.Set[T]] {
     def unpickle[P](pickle: P, state: mutable.Map[String, Any])(implicit config: PConfig[P]): Try[mutable.Set[T]] = {
       Unpickler.unpickleSeqish[T, mutable.Set, P](pickle, state)
     }

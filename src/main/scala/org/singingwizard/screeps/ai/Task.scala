@@ -9,8 +9,8 @@ trait Task {
     * The return value is very roughly in ticks it will take.
     *
     * @return an approximate number of ticks to perform the task
-    *         with creep, or Int.MaxValue if creep cannot perform 
-    *         this task.
+    *        with creep, or Int.MaxValue if creep cannot perform
+    *        this task.
     */
   def costFor(creep: Creep)(implicit ctx: AIContext): Int
 
@@ -31,9 +31,9 @@ trait Task {
   /** True once the task is completed.
     */
   def state: Task.State
-  
+
   /** The creep assigned to this task.
-   */
+    */
   def assignedCreep: Option[Creep]
 }
 
@@ -48,9 +48,9 @@ object Task {
   object State {
     implicit val pickler = CompositePickler[State].concreteType[NeedCreep.type].concreteType[Running].concreteType[Complete.type].concreteType[Failed]
   }
-  
+
   def pickler(taskTypes: TaskCompanion*): PicklerPair[Task] = {
-    taskTypes.foldRight(CompositePickler[Task])(_.register(_)) 
+    taskTypes.foldRight(CompositePickler[Task])(_.register(_))
   }
 }
 

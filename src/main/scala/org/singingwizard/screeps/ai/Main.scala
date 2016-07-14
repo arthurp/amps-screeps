@@ -13,13 +13,13 @@ object Main extends js.JSApp {
   @JSExport
   def getLoop(ctx: ScreepsContextImpl): js.Function0[Unit] = {
     ScreepsContext.current = ctx
-    
+
     val loop = new Loop()
     () => {
       try {
         loop.loop()
       } catch {
-        case e: Throwable => 
+        case e: Throwable =>
           ctx.Console.log(s"Exception while running loop: $e")
       }
       ()

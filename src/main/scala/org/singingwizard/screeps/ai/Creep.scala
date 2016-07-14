@@ -16,7 +16,7 @@ case class CreepBuildVector(
   }
 
   def size = move + work + carry + attack + rangedAttack + heal + claim + tough
-  
+
   def normalized = {
     CreepBuildVector(
       move / size, work / size, carry / size, attack / size, rangedAttack / size,
@@ -24,12 +24,12 @@ case class CreepBuildVector(
   }
 
   def cost: Double = {
-    (for((n, v) <- valueMapping) yield v * BODYPART_COST(n)).sum
+    (for ((n, v) <- valueMapping) yield v * BODYPART_COST(n)).sum
   }
 
   // TODO: It may be useful to allow intermixing of parts to control damage.
   def toCreepDefinition: js.Array[String] = {
-    (for((n, v) <- valueMapping) yield Seq.fill(v.toInt)(n)).flatten.toJSArray
+    (for ((n, v) <- valueMapping) yield Seq.fill(v.toInt)(n)).flatten.toJSArray
   }
 }
 
@@ -37,7 +37,7 @@ object CreepBuildVector {
   def fromCreepDefinition(body: js.Array[String]) = {
     val counts = body.groupBy(x => x).mapValues(_.size)
     CreepBuildVector(counts(MOVE), counts(WORK), counts(CARRY),
-        counts(ATTACK), counts(RANGED_ATTACK), counts(HEAL),
-        counts(CLAIM), counts(TOUGH))
+      counts(ATTACK), counts(RANGED_ATTACK), counts(HEAL),
+      counts(CLAIM), counts(TOUGH))
   }
 }

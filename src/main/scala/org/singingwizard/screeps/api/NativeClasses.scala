@@ -10,7 +10,7 @@ import scala.scalajs.js.UndefOr
 
 @js.native
 trait HasID extends js.Object {
-  val id: String  
+  val id: String
 }
 
 @js.native
@@ -329,13 +329,13 @@ trait FindFilterAlgorithm[T] extends FindFilter[T] {
 
 object FindFilterAlgorithm {
   import scala.language.implicitConversions
-  def apply[T](f: (T) => Boolean, algo: String): FindFilterAlgorithm[T] = 
+  def apply[T](f: (T) => Boolean, algo: String): FindFilterAlgorithm[T] =
     js.Dynamic.literal("filter" -> f, "algorithm" -> algo).asInstanceOf[FindFilterAlgorithm[T]]
-  
+
   // TODO: This is a dangerous hack I think. The member algorithm is not set. This may cause runtime errors.
-  def apply[T](f: (T) => Boolean): FindFilterAlgorithm[T] = 
+  def apply[T](f: (T) => Boolean): FindFilterAlgorithm[T] =
     js.Dynamic.literal("filter" -> f).asInstanceOf[FindFilterAlgorithm[T]]
-  
+
   implicit def FindFilter2FindFilterAlgorithm[T](f: FindFilter[T]): FindFilterAlgorithm[T] =
     apply(f.filter)
 }
@@ -348,19 +348,19 @@ trait RoomPosition extends js.Object {
 
   def createConstructionSite(structureType: String): Double
   def createFlag(name: String = ???, color: Double = ???, secondaryColor: Double = ???): Double
-  
+
   def findClosestByPath[T](typ: Int, opts: FindFilterAlgorithm[T] = ???): T
   @JSName("findClosestByPath")
   def findClosestByPathFrom[T](objects: js.Array[T] | js.Array[RoomPosition], opts: FindFilterAlgorithm[T] = ???): T
-  
+
   def findClosestByRange[T](typ: Int, opts: FindFilter[T] = ???): T
   @JSName("findClosestByRange")
   def findClosestByRangeFrom[T](objects: js.Array[T] | js.Array[RoomPosition], opts: FindFilter[T] = ???): T
-  
+
   def findInRange[T](typ: Int, range: Int, opts: FindFilter[T] = ???): js.Array[T]
   @JSName("findInRange")
   def findInRangeFrom[T](objects: js.Array[T] | js.Array[RoomPosition], range: Double, opts: FindFilter[T] = ???): js.Array[T]
-  
+
   //def findPathTo(x: Double, y: Double, opts: FindPathOpts = ???): js.Array[PathStep]
   def findPathTo(target: RoomPosition | js.Any, opts: FindPathOpts = ???): js.Array[PathStep]
   def getDirectionTo(x: Int, y: Int): Int
@@ -375,8 +375,6 @@ trait RoomPosition extends js.Object {
   def look(): js.Array[LookAtResult]
   def lookFor[T](typ: String): js.Array[T]
 }
-
-
 
 @js.native
 trait Source extends js.Object with HasID {
