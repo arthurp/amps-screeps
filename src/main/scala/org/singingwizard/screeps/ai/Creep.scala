@@ -22,6 +22,20 @@ case class CreepBuildVector(
       move / size, work / size, carry / size, attack / size, rangedAttack / size,
       heal / size, claim / size, tough / size)
   }
+  
+  def scaledToSize(n: Int) = {
+    val factor = n.toDouble / size
+    CreepBuildVector(
+      move / factor, work / factor, carry / factor, attack / factor, rangedAttack / factor,
+      heal / factor, claim / factor, tough / factor)    
+  }
+  
+  def scaledToCost(c: Int) = {
+    val factor = c.toDouble / cost
+    CreepBuildVector(
+      move / factor, work / factor, carry / factor, attack / factor, rangedAttack / factor,
+      heal / factor, claim / factor, tough / factor) 
+  }
 
   def cost: Double = {
     (for ((n, v) <- valueMapping) yield v * BODYPART_COST(n)).sum

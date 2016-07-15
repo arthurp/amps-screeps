@@ -1,5 +1,6 @@
 package org.singingwizard.screeps.wrappers
 
+import scalajs.js
 import scala.collection.mutable
 import org.singingwizard.screeps.api._
 import ScreepsContext._
@@ -23,5 +24,22 @@ object APIPickler {
       }
     }
   }
+
+  def namePickler[S <: HasName]: Pickler[S] = new Pickler[S] {
+    def pickle[P](value: S, state: PickleState)(implicit config: PConfig[P]): P = {
+      config.makeString(value.name)
+    }
+  }
+  def nameUnpickler[S <: HasName](lookup: js.Dictionary[S]): Unpickler[S] = new Unpickler[S] {
+    def unpickle[P](pickle: P, state: mutable.Map[String, Any])(implicit config: PConfig[P]) = {
+      config.readString(pickle).flatMap { name =>
+        val v = lookup(name)
+        if (v != null) Success(v) else Failure(new RuntimeException(s"Object with name $name does not exist"))
+      }
+    }
+  }
+  
+  implicit val roomPickler = namePickler[Room]
+  implicit val roomUnpickler = nameUnpickler(Game.rooms)
 
 }

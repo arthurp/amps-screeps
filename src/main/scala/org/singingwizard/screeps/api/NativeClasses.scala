@@ -14,6 +14,11 @@ trait HasID extends js.Object {
 }
 
 @js.native
+trait HasName extends js.Object {
+  val name: String
+}
+
+@js.native
 trait ConstructionSite extends RoomObject with HasID {
   val id: String
   val my: Boolean
@@ -29,7 +34,7 @@ trait Storage extends StructureStorage {
 }
 
 @js.native
-trait Creep extends RoomObject with HasID {
+trait Creep extends RoomObject with HasID with HasName {
   val body: js.Array[BodyPartDefinition]
   val carry: StoreDefinition
   val carryCapacity: Int
@@ -72,7 +77,7 @@ trait Creep extends RoomObject with HasID {
 }
 
 @js.native
-trait Flag extends RoomObject {
+trait Flag extends RoomObject with HasName {
   val color: Int
   val memory: js.Dynamic
   val name: String
@@ -292,7 +297,7 @@ object FindFilter {
 }
 
 @js.native
-trait Room extends js.Object {
+trait Room extends js.Object with HasName {
   val controller: StructureController
   val energyAvailable: Int
   val energyCapacityAvailable: Int
@@ -394,7 +399,7 @@ trait SpawningResult extends js.Object {
 }
 
 @js.native
-trait Spawn extends OwnedStructure with HasID {
+trait Spawn extends OwnedStructure with HasID with HasName {
   val energy: Int
   val energyCapacity: Int
   val id: String
