@@ -10,8 +10,13 @@ import org.singingwizard.screeps.wrappers.APIPickler
 import org.singingwizard.prickle.WeakRef
 
 case class GetEnergy(val creep: WeakRef[Creep], val amount: Int = Int.MaxValue,
+                     val k: Option[Task] = None,
                      var _source: Option[Source] = None,
-                     var state: Task.State = Task.NeedCreep) extends Task {
+                     var state: Int = GetEnergy.NEED_CREEP) extends TaskWithContinuation {
+  import GetEnergy._
+
+  def continuation: TraversableOnce[Task] = k
+
   def findBestSource(p: RoomPosition): Source = {
     val c = creep.get
     val nearSource = c.pos.findInRange[Source](FIND_SOURCES, 3)
@@ -40,24 +45,29 @@ case class GetEnergy(val creep: WeakRef[Creep], val amount: Int = Int.MaxValue,
     try {
       val c = creep.get
       state match {
-        case Task.NeedCreep =>
+        case NEED_CREEP =>
           if (ctx.claim(c)) {
-            state = Task.Running()
+            state = RUNNING
             _source = Some(findBestSource(c.pos))
             run()
+          } else {
+            // TODO: Block until creep available.
+            reschedule()
           }
-        case Task.Running(_) =>
+        case RUNNING =>
           if (c.carry.energy >= (amount min c.carryCapacity)) {
             ctx.unclaim(c)
-            state = Task.Complete
+            state = COMPLETE
+            finish()
           } else if (c.harvest(_source.get) == ERR_NOT_IN_RANGE) {
             c.moveTo(_source.get)
+            reschedule()
           }
         case _ => ()
       }
     } catch {
       case _: IllegalStateException =>
-        state = Task.Failed("Creep disappeared")
+        fail("Creep disappeared")
     }
   }
 
@@ -70,6 +80,11 @@ case class GetEnergy(val creep: WeakRef[Creep], val amount: Int = Int.MaxValue,
   */
 object GetEnergy extends TaskCompanion {
   import APIPickler._
+  import Task._
+
+  val NEED_CREEP = 0
+  val RUNNING = 1
+  val COMPLETE = 2
 
   def register(pickler: PicklerPair[Task]) = {
     pickler.concreteType[GetEnergy]

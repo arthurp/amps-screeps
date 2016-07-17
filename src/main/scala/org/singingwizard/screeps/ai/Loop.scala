@@ -2,6 +2,7 @@ package org.singingwizard.screeps.ai
 
 import scala.scalajs.js
 import scala.scalajs.js.{ UndefOr }
+import scala.scalajs.js.JSConverters._
 import org.singingwizard.screeps.api._
 import org.singingwizard.screeps.wrappers._
 import org.singingwizard.screeps.wrappers.APIPickler._
@@ -17,8 +18,6 @@ class Loop() {
   import ScreepsContext._
 
   implicit val PrickleConfig = NativeJsConfig()
-
-  implicit val taskPickler = Task.pickler(GetEnergy, SpawnCreep, TakeEnergyTo)
 
   // Caching doesn't seem to work because for some reason the state gets messed up but not cleared when calling loop.
   //var contextCache: AIContext = null
@@ -44,7 +43,7 @@ class Loop() {
 
     import ctx._
 
-    if (tasks.isEmpty) {
+    if (runnableTasks.isEmpty) {
       available.clear()
       for ((_, c) <- Game.creeps) {
         available += WeakRef(c)
@@ -54,38 +53,17 @@ class Loop() {
       }
     }
 
-    for (WeakRef(Commandable.Creep(c)) <- available if c.carry.energy < c.carryCapacity) {
-      tasks += new GetEnergy(c)
-    }
-    for (s <- Game.spawns.values if s.energy < s.energyCapacity 
-        if tasks.find({ 
-          case TakeEnergyTo(`s`, _, _, _) => true
-          case _ => false
-        }).isEmpty) {
-      tasks += new TakeEnergyTo(s, s.energyCapacity - s.energy)
-    }
-    
-    if (Game.creeps.size + tasks.count(_.isInstanceOf[SpawnCreep]) < 5) {
+    if (runnableTasks.isEmpty) {
       val kind = CreepBuildVector(move = 1, carry = 1, work = 1.1)
-      tasks += new SpawnCreep(Game.rooms.values.head, kind) 
+      schedule(new SpawnCreep(Game.rooms.values.head, kind)) 
+      //schedule(new SpawnCreep(Game.rooms.values.head, kind.scaledToCost(300))) 
     }
 
-    for (t <- tasks) {
+    val ts = runnableTasks.toJSArray
+    runnableTasks.clear()
+    for (t <- ts) {
       try {
-        t.state match {
-          case s @ (Task.Complete | Task.Failed(_)) =>
-            Console.log(s"WARNING: Encountered finished task in first check: $t")
-          case _ =>
-            Console.log(s"Running task: $t")
-            t.run()
-        }
-        t.state match {
-          case s @ (Task.Complete | Task.Failed(_)) =>
-            Console.log(s"Finished task $t (State: $s)")
-            tasks -= t
-          case _ =>
-            ()
-        }
+        t.run()
       } catch {
         case e: Exception =>
           Console.log(s"Failed to run task $t: $e")

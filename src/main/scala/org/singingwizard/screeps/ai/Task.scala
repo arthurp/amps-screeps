@@ -1,31 +1,28 @@
 package org.singingwizard.screeps.ai
 
 import org.singingwizard.screeps.api._
+import org.singingwizard.screeps.api.ScreepsContext._
 import prickle.CompositePickler
 import prickle.PicklerPair
+import org.singingwizard.screeps.ai.tasks._
 
 trait Task {
-  /** Perform the actions of this task.
+  /** Execute the task.
     */
   def run()(implicit ctx: AIContext): Unit
-
-  /** True once the task is completed.
-    */
-  def state: Task.State
+  
+  def reschedule()(implicit ctx: AIContext) = {
+    ctx.schedule(this)
+  }
+  
+  def fail(msg: String) = {
+    Console.log(s"Task '$this' failed with: $msg")
+  }
 }
 
-object Task {
-  sealed trait State
-
-  case object NeedCreep extends State
-  case class Running(state: Int = 0) extends State
-  case object Complete extends State
-  case class Failed(reason: String) extends State
-
-  object State {
-    implicit val pickler = CompositePickler[State].concreteType[NeedCreep.type].concreteType[Running].concreteType[Complete.type].concreteType[Failed]
-  }
-
+object Task {  
+  implicit val taskPickler = Task.pickler(GetEnergy, SpawnCreep, TakeEnergyTo)
+  
   def pickler(taskTypes: TaskCompanion*): PicklerPair[Task] = {
     taskTypes.foldRight(CompositePickler[Task])(_.register(_))
   }
@@ -33,4 +30,12 @@ object Task {
 
 trait TaskCompanion {
   def register(pickler: PicklerPair[Task]): PicklerPair[Task]
+}
+
+trait TaskWithContinuation extends Task {
+  def continuation: TraversableOnce[Task]
+  
+  def finish()(implicit ctx: AIContext) = {
+    continuation.map(ctx.schedule(_))
+  }
 }

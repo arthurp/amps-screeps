@@ -31,7 +31,12 @@ case class SourceData(source: Source, positions: Int)
   
 case class RoomData(room: String, sources: Seq[SourceData])
 
-case class AIContext(tasks: mutable.Set[Task] = mutable.Set(), available: mutable.Set[WeakRef[Commandable]] = mutable.Set()) {
+case class AIContext(runnableTasks: mutable.Set[Task] = mutable.Set(), available: mutable.Set[WeakRef[Commandable]] = mutable.Set()) {
+  def isAvailable(c: Commandable): Boolean = {
+    val cc = WeakRef(c)
+    //Console.log(s"Claiming $cc (${cc.hashCode}) from ${available.map(cc => s"$cc (${cc.hashCode})").mkString("[",",","]")} (${available.contains(c)})") 
+    available.contains(c)
+  }
   def claim(c: Commandable): Boolean = {
     val cc = WeakRef(c)
     //Console.log(s"Claiming $cc (${cc.hashCode}) from ${available.map(cc => s"$cc (${cc.hashCode})").mkString("[",",","]")} (${available.contains(c)})") 
@@ -41,6 +46,10 @@ case class AIContext(tasks: mutable.Set[Task] = mutable.Set(), available: mutabl
     if (!available.add(c)) {
       Console.log(s"Added commandable to available list that was already there: $c")
     }
+  }
+  
+  def schedule(t: Task): Unit = {
+    runnableTasks += t
   }
 
   val roomDataCache = mutable.Map[String, RoomData]()

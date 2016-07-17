@@ -37,8 +37,8 @@ case class CreepBuildVector(
       heal / factor, claim / factor, tough / factor) 
   }
 
-  def cost: Double = {
-    (for ((n, v) <- valueMapping) yield v * BODYPART_COST(n)).sum
+  def cost: Int = {
+    (for ((n, v) <- valueMapping) yield v * BODYPART_COST(n)).sum.toInt
   }
 
   // TODO: It may be useful to allow intermixing of parts to control damage.

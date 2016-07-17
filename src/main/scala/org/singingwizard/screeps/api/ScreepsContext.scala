@@ -353,6 +353,30 @@ object ScreepsContext {
 
   val jsObj = js.Dynamic.literal
 
+  def errcodeToString(e: Int) = {
+    val c = current
+    e match {
+      case c.OK                        => "OK"
+      case c.ERR_NOT_OWNER             => "Not owner"
+      case c.ERR_NO_PATH               => "No path"
+      case c.ERR_NAME_EXISTS           => "Name exists"
+      case c.ERR_BUSY                  => "Busy"
+      case c.ERR_NOT_FOUND             => "Not found"
+      case c.ERR_NOT_ENOUGH_ENERGY     => "Not enough energy"
+      case c.ERR_NOT_ENOUGH_RESOURCES  => "Not enough resources"
+      case c.ERR_INVALID_TARGET        => "Invalid target"
+      case c.ERR_FULL                  => "Full"
+      case c.ERR_NOT_IN_RANGE          => "Not in range"
+      case c.ERR_INVALID_ARGS          => "Invalid arguments"
+      case c.ERR_TIRED                 => "Tired"
+      case c.ERR_NO_BODYPART           => "No body part"
+      case c.ERR_NOT_ENOUGH_EXTENSIONS => "Not enough extensions"
+      case c.ERR_RCL_NOT_ENOUGH        => "Not enough RCL"
+      case c.ERR_GCL_NOT_ENOUGH        => "Not enough GCL"
+      case _                           => "Unknown"
+    }
+  }
+
   def OK: Int = current.OK
   def ERR_NOT_OWNER: Int = current.ERR_NOT_OWNER
   def ERR_NO_PATH: Int = current.ERR_NO_PATH
