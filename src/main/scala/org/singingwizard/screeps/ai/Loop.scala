@@ -13,6 +13,7 @@ import org.singingwizard.prickle.NativeJsConfig
 import scala.util.{ Try, Failure, Success }
 import AIContext._
 import org.singingwizard.screeps.ai.tasks._
+import be.doeraene.sjsreflect.Reflect
 
 class Loop() {
   import ScreepsContext._
@@ -24,6 +25,13 @@ class Loop() {
 
   def loop(): Unit = {
     PathFinder.use(true)
+
+    {
+      val cls = Reflect.getClassForName("org.singingwizard.screeps.ai.tasks.GetEnergy")
+      println(cls)
+      val cstrs = Reflect.getDeclaredConstructors(cls.get)
+      println(cstrs)
+    }
 
     // Check the cache before loading to see if we still have our object state.
     implicit val ctx: AIContext = try {

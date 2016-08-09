@@ -1,5 +1,6 @@
 // Turn this project into a Scala.js project by importing these settings
 enablePlugins(ScalaJSPlugin)
+enablePlugins(ScalaJSReflectionPlugin)
 
 name := "Amps-Screeps"
 
@@ -15,7 +16,13 @@ testFrameworks += new TestFramework("utest.runner.Framework")
 
 libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
-    "com.github.benhutchison" %%% "prickle" % "1.1.10"
+    "com.github.benhutchison" %%% "prickle" % "1.1.10",
+    "be.doeraene" %%% "scalajs-reflection" % "0.1.0"
+)
+
+scalaJSReflectSelectors ++= Seq(
+  selectDescendentClasses("org.singingwizard.screeps.ai.Task") -> reflectClassByName(),
+  selectDescendentClasses("org.singingwizard.screeps.ai.Task") -> reflectDeclaredConstructors()
 )
 
 scalacOptions ++= Seq("-feature")
